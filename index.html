@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnLink - Secure Educational Ecosystem</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-blue: #2563eb; 
+            --secondary-blue: #dbeafe;
+            --dark-blue: #1e40af;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --black: #1e293b;
+            --border-color: #e2e8f0;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--light-bg); margin: 0; color: var(--black); line-height: 1.5; }
+        .hidden { display: none !important; }
+
+        header { 
+            background: var(--white); 
+            padding: 0.5rem 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-img { height: 60px; width: auto; cursor: pointer; }
+        
+        nav.top-nav { 
+            background: var(--white); 
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 5%; 
+            display: flex; 
+            gap: 15px;
+            overflow-x: auto;
+        }
+        
+        .nav-link { 
+            color: #64748b; 
+            padding: 15px 12px; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-link:hover { color: var(--primary-blue); }
+        .nav-link.active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); }
+
+        main { padding: 30px 5%; max-width: 1200px; margin: auto; min-height: 70vh; }
+        
+        .card { background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card h2, .card h3 { margin-top: 0; color: var(--black); display: flex; align-items: center; gap: 10px; }
+
+        .auth-wrapper { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f1f5f9; padding: 20px; }
+        .login-card { background: var(--white); padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary-blue); ring: 2px solid var(--secondary-blue); }
+        
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { background: var(--dark-blue); }
+        .btn-outline { background: transparent; color: var(--primary-blue); border: 1px solid var(--primary-blue); }
+        .btn-outline:hover { background: var(--secondary-blue); }
+        .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; }
+        th { background: #f8fafc; color: #64748b; padding: 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        
+       
+        .attendance-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .day-cell { aspect-ratio: 1; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+        .day-cell.present { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .day-cell.absent { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .day-label { font-weight: bold; text-align: center; font-size: 0.7rem; color: #94a3b8; padding-bottom: 5px; }
+
+  
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
+        .book-item { padding: 15px; border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; background: #fff; transition: 0.2s; }
+        .book-item:hover { border-color: var(--primary-blue); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+     
+        footer { background: var(--white); border-top: 1px solid var(--border-color); padding: 40px 5%; margin-top: 50px; }
+        .footer-content { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .social-link { display: flex; align-items: center; gap: 10px; color: #64748b; text-decoration: none; margin-bottom: 8px; font-size: 0.9rem; transition: 0.2s; }
+        .social-link:hover { color: var(--primary-blue); }
+
+        .about-section h4 { color: var(--primary-blue); margin-bottom: 10px; }
+        .about-section p { font-size: 0.9rem; color: #64748b; margin-bottom: 15px; }
+        .objective-list { list-style: none; padding: 0; font-size: 0.9rem; color: #64748b; }
+        .objective-list li::before { content: "✓"; color: var(--primary-blue); font-weight: bold; margin-right: 8px; }
+
+       
+        .record-item { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .record-actions { display: flex; gap: 8px; }
+        .icon-btn { border: none; background: none; cursor: pointer; color: #64748b; transition: 0.2s; padding: 4px; }
+        .icon-btn:hover { color: var(--primary-blue); }
+        .icon-btn.delete:hover { color: var(--danger); }
+
+        .grade-group { margin-bottom: 30px; }
+        .grade-group h4 { background: var(--secondary-blue); color: var(--dark-blue); padding: 8px 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--primary-blue); }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; }
+            .logo-img { height: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="app-header" class="hidden">
+        <img src="logo.png" alt="LearnLink" class="logo-img" onclick="switchTab('view-home')">
+        <div id="user-display" style="font-size: 0.85rem; font-weight: 500;"></div>
+        <button class="btn-outline" style="width: auto; padding: 8px 16px;" onclick="location.reload()">Sign Out</button>
+    </header>
+
+    <nav id="main-nav" class="top-nav hidden"></nav>
+
+    <div id="login-screen" class="auth-wrapper">
+        <img src="logo.png" alt="LearnLink" style="height: 120px; margin-bottom: 20px;">
+        <div class="login-card">
+            <h2 style="margin-bottom: 10px;">Welcome Back</h2>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 25px;">Please sign in to access your dashboard</p>
+            
+            <select id="login-role" onchange="toggleTeacherKey()">
+                <option value="student">Student</option>
+                <option value="parent">Parent</option>
+                <option value="teacher">Teacher</option>
+            </select>
+            <input type="text" id="login-name" placeholder="Full Name or LL-ID">
+            <select id="login-grade">
+                <option value="9">Grade 9</option>
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+                <option value="12">Grade 12</option>
+            </select>
+            <div id="teacher-key-container" class="hidden">
+                <input type="password" id="login-password" placeholder="Teacher Access Key">
+            </div>
+            <button class="btn-primary" style="margin-top: 15px;" onclick="initApp()">Access LearnLink</button>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                <a href="#" onclick="showLandingTab('view-about')" style="font-size: 0.8rem; color: var(--primary-blue);">About Us</a>
+                <span style="color: #cbd5e1;">|</span>
+                <a href="#" onclick="showLandingTab('view-contact')" style="font-size: 0.8rem; color: var(--primary-blue);">Contact Support</a>
+            </div>
+        </div>
+    </div>
+
+    <main id="app-main" class="hidden">
+        
+        <div id="view-home" class="tab-content hidden">
+            <div class="card">
+                <h2><i data-lucide="megaphone"></i> Daily Classroom Updates</h2>
+                <div id="lesson-display" style="background: var(--light-bg); padding: 20px; border-radius: 10px;">
+                    <p><strong>Current Topic:</strong> <span id="disp-topic" style="color: var(--primary-blue);">Loading...</span></p>
+                    <p><strong>Task/Question:</strong> <br><span id="disp-q" style="color: #64748b;">No updates today. Check back later!</span></p>
+                </div>
+            </div>
+            <div class="card" id="student-response-card">
+                <h3><i data-lucide="pen-tool"></i> Your Response</h3>
+                <textarea id="ans-input" maxlength="250" placeholder="Type your answer or reflection here..."></textarea>
+                <button class="btn-primary" style="width: auto; padding-inline: 30px;" onclick="submitAnswer()">Submit Work</button>
+            </div>
+        </div>
+
+        <div id="view-about" class="tab-content">
+            <div class="card about-section">
+                <h2><i data-lucide="info"></i> About LearnLink</h2>
+                <p><strong>The Mission:</strong> LearnLink is a digital bridge between students and educators, designed to make academic resources accessible 24/7. We believe in empowering the modern Ethiopian classroom through technology.</p>
+                
+                <h4>Core Objectives</h4>
+                <ul class="objective-list">
+                    <li><strong>Centralization:</strong> All textbooks and grades in one secure location.</li>
+                    <li><strong>Transparency:</strong> Real-time performance tracking for students and parents.</li>
+                    <li><strong>Efficiency:</strong> Streamlining classroom updates to replace slow, manual systems.</li>
+                </ul>
+
+                <h4>Security & The "Why"</h4>
+                <p>LearnLink was built to solve the problem of lost paperwork and missed announcements. Our portal uses Role-Based Access Control and Teacher Authentication Keys to protect sensitive student data, ensuring every student has an equal "link" to their education.</p>
+                
+                <blockquote style="border-left: 4px solid var(--primary-blue); padding-left: 15px; font-style: italic; color: #475569; margin: 20px 0;">
+                    "LearnLink isn't just a website; it's a secure, scalable educational ecosystem designed for the modern Ethiopian classroom."
+                </blockquote>
+            </div>
+        </div>
+
+        <div id="view-contact" class="tab-content hidden">
+            <div class="card">
+                <h2><i data-lucide="phone"></i> Contact Support</h2>
+                <div class="grid">
+                    <div>
+                        <h4 style="margin-bottom: 10px;">Phone Support</h4>
+                        <div class="social-link"><i data-lucide="phone"></i> +251 993 811 990</div>
+                        <div class="social-link"><i data-lucide="phone"></i> +251 900 472 238</div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px;">Social Media</h4>
+                        <a href="#" class="social-link"><i data-lucide="instagram"></i> Fifi_luvvv</a>
+                        <a href="#" class="social-link"><i data-lucide="instagram"></i> Nani_ih_</a>
+                        <a href="#" class="social-link"><i data-lucide="send"></i> @Sw33t_luvvv</a>
+                        <a href="#" class="social-link"><i data-lucide="send"></i> @Nani_ih</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-grade" class="tab-content hidden">
+            <div class="card">
+                <h2><i data-lucide="bar-chart-3"></i> Academic Performance</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Mid-Term (/60)</th>
+                            <th>Final Exam (/40)</th>
+                            <th>Total (/100)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-grade-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-books" class="tab-content hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2><i data-lucide="book-open"></i> Digital Library (.pdf)</h2>
+                    <select id="book-grade-filter" style="width: 180px; margin: 0;" onchange="renderBooks()">
+                        <option value="all">All Grades</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                </div>
+                <div id="book-list" class="book-grid"></div>
+            </div>
+        </div>
+
+    
+        <div id="teacher-records" class="tab-content hidden">
+            <div class="grid">
+                <div class="card">
+                    <h3><i data-lucide="calendar-check"></i> Attendance Tracker</h3>
+                    <p style="font-size: 0.8rem; color: #64748b;">Select a student and click dates to toggle status.</p>
+                    <select id="attendance-student-select" onchange="renderAttendance()">
+                        </select>
+                    <div id="attendance-calendar-ui">
+                        <div class="attendance-grid" id="calendar-grid"></div>
+                    </div>
+                    <div style="display: flex; gap: 15px; margin-top: 15px; font-size: 0.75rem;">
+                        <span style="display: flex; align-items: center; gap: 4px;"><div style="width:12px; height:12px; background:#dcfce7; border-radius:2px;"></div> Present</span>
+                        <span style="display: flex; align-items: center; gap: 4px;"><div style="width:12px; height:12px; background:#fee2e2; border-radius:2px;"></div> Absent</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i data-lucide="user-plus"></i> Grade Management</h3>
+                    <input type="text" id="m-name" placeholder="Student Full Name">
+                    <select id="m-grade">
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="m-mid" placeholder="Mid /60" max="60" oninput="calculateTotal()">
+                        <input type="number" id="m-final" placeholder="Final /40" max="40" oninput="calculateTotal()">
+                    </div>
+                    <div id="total-preview" style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px; font-weight:bold; color:var(--primary-blue); text-align:center;">Total: 0/100</div>
+                    <input type="hidden" id="edit-index" value="-1">
+                    <button class="btn-primary" id="save-grade-btn" onclick="saveGradeRecord()">Add Student Record</button>
+                    <div id="teacher-grade-list" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3><i data-lucide="layout"></i> Classroom Management</h3>
+                    <input type="text" id="t-topic" placeholder="Lesson Topic (e.g. Intro to Genetics)">
+                    <textarea id="t-q" placeholder="Assignment or Question for the dashboard..."></textarea>
+                    <button class="btn-primary" onclick="updateClassroom()">Publish to Dashboard</button>
+                </div>
+                <div class="card">
+                    <h3><i data-lucide="shield-check"></i> Security Settings</h3>
+                    <p style="font-size: 0.8rem; color: #64748b;">Update your Teacher Access Key.</p>
+                    <input type="password" id="new-teacher-key" placeholder="Enter New Access Key">
+                    <button class="btn-outline" onclick="changeTeacherKey()">Update Key</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="teacher-student-list" class="tab-content hidden">
+            <div class="card">
+                <h2><i data-lucide="users"></i> Student Directory</h2>
+                <div id="directory-container">
+                    <!-- Categorized student lists will go here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="teacher-inbox" class="tab-content hidden">
+            <div class="grid">
+                <div class="card">
+                    <h3><i data-lucide="message-square"></i> Private Feedback</h3>
+                    <div id="t-feedback-list"></div>
+                </div>
+                <div class="card">
+                    <h3><i data-lucide="help-circle"></i> Student Answers</h3>
+                    <div id="t-answers-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-feedback" class="tab-content hidden">
+            <div class="card">
+                <h2><i data-lucide="send"></i> Direct Feedback</h2>
+                <p style="font-size: 0.9rem; color: #64748b;">Your message will be sent privately to your teacher.</p>
+                <textarea id="feedback-msg" placeholder="Ask a question or share your thoughts..."></textarea>
+                <button class="btn-primary" onclick="sendFeedback()">Send Message</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>
+                <img src="logo.png" alt="LearnLink" style="height: 50px; margin-bottom: 15px;">
+                <p style="font-size: 0.85rem; color: #64748b;">The secure educational ecosystem for the modern classroom. Connecting knowledge with accessibility.</p>
+            </div>
+            <div>
+                <h4 style="margin-top: 0;">Quick Links</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="#" onclick="showLandingTab('view-about')" style="font-size: 0.9rem; color: #64748b; text-decoration: none;">About Our Mission</a>
+                    <a href="#" onclick="showLandingTab('view-contact')" style="font-size: 0.9rem; color: #64748b; text-decoration: none;">Support Center</a>
+                    <a href="#" onclick="location.reload()" style="font-size: 0.9rem; color: #64748b; text-decoration: none;">Portal Login</a>
+                </div>
+            </div>
+            <div>
+                <h4 style="margin-top: 0;">Contact Us</h4>
+                <div class="social-link"><i data-lucide="phone" size="16"></i> +251 993 811 990</div>
+                <div class="social-link"><i data-lucide="instagram" size="16"></i> Fifi_luvvv</div>
+                <div class="social-link"><i data-lucide="send" size="16"></i> @Sw33t_luvvv</div>
+            </div>
+        </div>
+        <div style="text-align: center; padding-top: 30px; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid var(--border-color); margin-top: 30px;">
+            &copy; 2024 LearnLink Ethiopia. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+  
+        let currentUser = { name: '', role: '', grade: '' };
+        
+      const BOOKS = [
+    { id: 1, g: 9, t: "Biology-STB-2023.pdf", icon: "🧬", link: "pdfs/G9-Biology-STB-2023-web.pdf" },
+    { id: 2, g: 9, t: "Chemistry-STB-2023.pdf", icon: "🧪", link: "pdfs/G9-Chemistry-STB-2023-web.pdf" },
+    { id: 4, g: 9, t: "English-STB-2023.pdf", icon: "📖", link: "pdfs/G9-English-STB-2023-web.pdf" },
+    { id: 7, g: 9, t: "Mathematics-STB-2023.pdf", icon: "🔢", link: "pdfs/G9-Mathematics-STB-2023-web.pdf" },
+
+    { id: 9, g: 10, t: "Biology-STB-2023.pdf", icon: "🧬", link: "pdfs/G10-Biology-STB-2023-web.pdf" },
+    { id: 10, g: 10, t: "Chemistry-STB-2023.pdf", icon: "🧪", link: "pdfs/Chemistry-STB-2023.pdf" },
+    { id: 14, g: 10, t: "Mathematics-STB.pdf", icon: "🔢", link: "pdfs/Mathematics-STB.pdf" },
+
+    { id: 17, g: 11, t: "Biology-STB-2023.pdf", icon: "🧬", link: "pdfs/G11-Biology-STB-2023-web.pdf" },
+    { id: 18, g: 11, t: "Chemistry-STB-2023.pdf", icon: "🧪", link: "pdfs/Chemistry-STB-2023.pdf" },
+    { id: 20, g: 11, t: "English-STB-2023.pdf", icon: "📖", link: "pdfs/English-STB-2023.pdf" },
+
+    { id: 25, g: 12, t: "Chemistry-STB-2023.pdf", icon: "🧪", link: "pdfs/Chemistry-STB-2023.pdf" },
+    { id: 30, g: 12, t: "Mathematics-STB-2023.pdf", icon: "🔢", link: "pdfs/Mathematics-STB-2023.pdf" },
+    { id: 31, g: 12, t: "Physics-STB-2023.pdf", icon: "⚙️", link: "pdfs/Physics-STB-2023.pdf" }
+];
+
+bookElement.innerHTML = `
+    <span>${book.icon}</span>
+    <button onclick="window.open('${book.link}', '_blank')">
+        ${book.t}
+    </button>
+`;
+     
+        function toggleTeacherKey() {
+            const role = document.getElementById('login-role').value;
+            document.getElementById('teacher-key-container').classList.toggle('hidden', role !== 'teacher');
+        }
+
+        function calculateTotal() {
+            const mid = parseFloat(document.getElementById('m-mid').value) || 0;
+            const final = parseFloat(document.getElementById('m-final').value) || 0;
+            const total = mid + final;
+            document.getElementById('total-preview').innerText = `Total: ${total}/100`;
+        }
+
+        function showLandingTab(tabId) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-main').classList.remove('hidden');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            const nav = document.getElementById('main-nav');
+            nav.classList.remove('hidden');
+            nav.innerHTML = `
+                <a class="nav-link" onclick="location.reload()">Back to Login</a>
+                <a class="nav-link ${tabId === 'view-about' ? 'active' : ''}" onclick="showLandingTab('view-about')">About Us</a>
+                <a class="nav-link ${tabId === 'view-contact' ? 'active' : ''}" onclick="showLandingTab('view-contact')">Contact</a>
+            `;
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+        function initApp() {
+            const loginInput = document.getElementById('login-name').value.trim();
+            const grade = document.getElementById('login-grade').value;
+            const role = document.getElementById('login-role').value;
+            const key = document.getElementById('login-password').value;
+
+            const storedKey = localStorage.getItem('ll_teacher_key') || '1234';
+
+            if(!loginInput) return alert("Please enter your name or LL-ID");
+          
+            let name = loginInput;
+            const data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            const foundStudent = data.find(s => s.id === loginInput || s.name.toLowerCase() === loginInput.toLowerCase());
+            
+            if (role !== 'teacher' && foundStudent) {
+                name = foundStudent.name;
+            }
+
+            if(role === 'teacher' && key !== storedKey) return alert("Invalid Teacher Authentication Key");
+
+            currentUser = { name, role, grade };
+            
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-main').classList.remove('hidden');
+            document.getElementById('main-nav').classList.remove('hidden');
+            
+            document.getElementById('user-display').innerHTML = `
+                <span style="color:var(--primary-blue)">●</span> ${name} 
+                <span style="color:#94a3b8; margin:0 5px;">|</span> Grade ${grade} (${role.toUpperCase()})
+            `;
+
+            setupNavigation();
+            switchTab(role === 'teacher' ? 'teacher-records' : 'view-home');
+            
+            renderBooks();
+            syncClassroom();
+            refreshTeacherInbox();
+            renderGrades();
+            if(role === 'teacher') {
+                populateAttendanceSelect();
+                renderStudentDirectory();
+            }
+            
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+        function setupNavigation() {
+            const nav = document.getElementById('main-nav');
+            if (currentUser.role === 'teacher') {
+                nav.innerHTML = `
+                    <a class="nav-link active" onclick="switchTab('teacher-records', this)">Dashboard</a>
+                    <a class="nav-link" onclick="switchTab('teacher-student-list', this)">Student List</a>
+                    <a class="nav-link" onclick="switchTab('teacher-inbox', this)">Student Feedback</a>
+                    <a class="nav-link" onclick="switchTab('view-books', this)">Library</a>
+                    <a class="nav-link" onclick="switchTab('view-about', this)">About Us</a>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <a class="nav-link active" onclick="switchTab('view-home', this)">Home</a>
+                    <a class="nav-link" onclick="switchTab('view-grade', this)">My Results</a>
+                    <a class="nav-link" onclick="switchTab('view-books', this)">Books</a>
+                    <a class="nav-link" onclick="switchTab('view-feedback', this)">Contact Teacher</a>
+                    <a class="nav-link" onclick="switchTab('view-about', this)">About Us</a>
+                `;
+            }
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            if(el) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                el.classList.add('active');
+            }
+            if(tabId === 'teacher-student-list') renderStudentDirectory();
+            window.scrollTo(0, 0);
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+      
+        function changeTeacherKey() {
+            const newKey = document.getElementById('new-teacher-key').value;
+            if(!newKey) return alert("Please enter a new key");
+            localStorage.setItem('ll_teacher_key', newKey);
+            document.getElementById('new-teacher-key').value = '';
+            alert("Teacher Access Key Updated Successfully!");
+        }
+
+        
+       function renderBooks() {
+    const filter = document.getElementById('book-grade-filter').value;
+    const container = document.getElementById('book-list');
+    container.innerHTML = '';
+
+    const filtered = BOOKS.filter(b => filter === 'all' || b.g.toString() === filter);
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8;">No books found.</p>';
+        return;
+    }
+
+    filtered.forEach(b => {
+        container.innerHTML += `
+            <div class="book-item" onclick="window.open('${b.link}', '_blank')">
+                <span style="font-size: 1.5rem;">${b.icon}</span>
+                <div style="flex:1">
+                    <div style="font-size:0.7rem; color:#94a3b8;">Grade ${b.g}</div>
+                    <div style="font-weight:600; font-size:0.85rem;">${b.t}</div>
+                </div>
+                <i data-lucide="download" style="width:16px; color:#cbd5e1;"></i>
+            </div>
+        `;
+    });
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+     
+        function generateUniqueID() {
+            return 'LL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function saveGradeRecord() {
+            const name = document.getElementById('m-name').value.trim();
+            const grade = document.getElementById('m-grade').value;
+            const mid = parseFloat(document.getElementById('m-mid').value) || 0;
+            const fin = parseFloat(document.getElementById('m-final').value) || 0;
+            const editIdx = parseInt(document.getElementById('edit-index').value);
+
+            if(!name) return alert("Student name is required");
+            if(mid > 60 || fin > 40) return alert("Max Mid: 60, Max Final: 40");
+
+            let data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            
+            if(editIdx > -1) {
+                data[editIdx] = { ...data[editIdx], name, mid, fin, grade };
+                document.getElementById('edit-index').value = "-1";
+                document.getElementById('save-grade-btn').innerText = "Add Student Record";
+            } else {
+                const newId = generateUniqueID();
+                data.push({ id: newId, name, mid, fin, grade });
+                alert(`New Student Added!\nUnique ID: ${newId}\nKeep this for login.`);
+            }
+            
+            localStorage.setItem('ll_grades', JSON.stringify(data));
+            
+            document.getElementById('m-name').value = '';
+            document.getElementById('m-mid').value = '';
+            document.getElementById('m-final').value = '';
+            document.getElementById('total-preview').innerText = 'Total: 0/100';
+            
+            renderGrades();
+            renderStudentDirectory();
+            populateAttendanceSelect();
+        }
+
+        function deleteGrade(index) {
+            if(!confirm("Are you sure you want to remove this record?")) return;
+            let data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            data.splice(index, 1);
+            localStorage.setItem('ll_grades', JSON.stringify(data));
+            renderGrades();
+            renderStudentDirectory();
+            populateAttendanceSelect();
+        }
+
+        function editGrade(index) {
+            let data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            const record = data[index];
+            document.getElementById('m-name').value = record.name;
+            document.getElementById('m-grade').value = record.grade;
+            document.getElementById('m-mid').value = record.mid;
+            document.getElementById('m-final').value = record.fin;
+            document.getElementById('edit-index').value = index;
+            document.getElementById('save-grade-btn').innerText = "Update Record";
+            calculateTotal();
+            switchTab('teacher-records');
+            window.scrollTo(0, document.getElementById('m-name').offsetTop - 100);
+        }
+
+        function renderGrades() {
+            const data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            
+            // Student View
+            const sBody = document.getElementById('student-grade-body');
+            if(sBody) {
+                sBody.innerHTML = '';
+                const my = data.filter(r => r.name.toLowerCase() === currentUser.name.toLowerCase());
+                my.forEach(r => {
+                    sBody.innerHTML += `
+                        <tr>
+                            <td>Annual Assessment</td>
+                            <td>${r.mid} / 60</td>
+                            <td>${r.fin} / 40</td>
+                            <td><strong>${(r.mid || 0) + (r.fin || 0)} / 100</strong></td>
+                            <td><span style="color:var(--success)">Recorded</span></td>
+                        </tr>
+                    `;
+                });
+            }
+            const tList = document.getElementById('teacher-grade-list');
+            if(tList) {
+                tList.innerHTML = '<h4 style="font-size:0.8rem; color:#94a3b8; margin-bottom:10px;">Recent Activity:</h4>';
+                if(data.length === 0) {
+                    tList.innerHTML += '<p style="font-size:0.8rem; color:#94a3b8;">No records found.</p>';
+                }
+               
+                data.slice(-5).reverse().forEach((r, idx) => {
+                    const actualIdx = data.indexOf(r);
+                    tList.innerHTML += `
+                        <div class="record-item">
+                            <div>
+                                <div style="font-weight:600; font-size:0.85rem;">${r.name} (${r.id})</div>
+                                <div style="font-size:0.75rem; color:#64748b;">Total: ${(r.mid||0)+(r.fin||0)}/100 | G${r.grade}</div>
+                            </div>
+                            <div class="record-actions">
+                                <button class="icon-btn" onclick="editGrade(${actualIdx})"><i data-lucide="edit-2" size="16"></i></button>
+                                <button class="icon-btn delete" onclick="deleteGrade(${actualIdx})"><i data-lucide="trash-2" size="16"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+        function renderStudentDirectory() {
+            const container = document.getElementById('directory-container');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            const grades = ['9', '10', '11', '12'];
+            
+            grades.forEach(g => {
+                const students = data.filter(s => s.grade === g);
+                if(students.length > 0) {
+                    let groupHtml = `
+                        <div class="grade-group">
+                            <h4>Grade ${g} (${students.length} Students)</h4>
+                            <div class="grid">
+                    `;
+                    students.forEach(s => {
+                        const originalIdx = data.indexOf(s);
+                        groupHtml += `
+                            <div class="record-item">
+                                <div>
+                                    <div style="font-weight:600; font-size:0.85rem;">${s.name}</div>
+                                    <div style="font-size:0.75rem; color:var(--primary-blue); font-family: monospace;">ID: ${s.id}</div>
+                                    <div style="font-size:0.7rem; color:#64748b;">Mid: ${s.mid} | Final: ${s.fin} | Total: ${(s.mid||0)+(s.fin||0)}</div>
+                                </div>
+                                <div class="record-actions">
+                                    <button class="icon-btn" onclick="editGrade(${originalIdx})"><i data-lucide="edit-2" size="14"></i></button>
+                                    <button class="icon-btn delete" onclick="deleteGrade(${originalIdx})"><i data-lucide="trash-2" size="14"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    groupHtml += `</div></div>`;
+                    container.innerHTML += groupHtml;
+                }
+            });
+
+            if(data.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:40px;">No students registered in the system yet.</p>';
+            }
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+      
+        function populateAttendanceSelect() {
+            const sel = document.getElementById('attendance-student-select');
+            const data = JSON.parse(localStorage.getItem('ll_grades') || '[]');
+            const uniqueNames = [...new Set(data.map(i => i.name))];
+            
+            sel.innerHTML = '<option value="">-- Choose Student --</option>';
+            uniqueNames.forEach(n => {
+                sel.innerHTML += `<option value="${n}">${n}</option>`;
+            });
+        }
+
+        function renderAttendance() {
+            const student = document.getElementById('attendance-student-select').value;
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            if(!student) return;
+
+            const attData = JSON.parse(localStorage.getItem('ll_attendance') || '{}');
+            const studentHistory = attData[student] || [];
+
+            for(let i=1; i<=31; i++) {
+                const isPresent = studentHistory.includes(i);
+                const cell = document.createElement('div');
+                cell.className = `day-cell ${isPresent ? 'present' : 'absent'}`;
+                cell.innerHTML = `<span>${i}</span><span style="font-size:0.5rem">${isPresent ? 'P' : 'A'}</span>`;
+                cell.onclick = () => toggleAttendance(student, i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function toggleAttendance(student, day) {
+            let attData = JSON.parse(localStorage.getItem('ll_attendance') || '{}');
+            if(!attData[student]) attData[student] = [];
+            
+            const idx = attData[student].indexOf(day);
+            if(idx > -1) attData[student].splice(idx, 1);
+            else attData[student].push(day);
+
+            localStorage.setItem('ll_attendance', JSON.stringify(attData));
+            renderAttendance();
+        }
+
+      
+        function updateClassroom() {
+            const topic = document.getElementById('t-topic').value;
+            const q = document.getElementById('t-q').value;
+            localStorage.setItem('ll_classroom', JSON.stringify({topic, q}));
+            alert("Classroom Synchronized!");
+            syncClassroom();
+        }
+
+        function syncClassroom() {
+            const task = JSON.parse(localStorage.getItem('ll_classroom') || '{"topic":"Welcome to LearnLink", "q":"Watch this space for daily classroom updates and questions."}');
+            document.getElementById('disp-topic').innerText = task.topic;
+            document.getElementById('disp-q').innerText = task.q;
+        }
+
+        function sendFeedback() {
+            const msg = document.getElementById('feedback-msg').value.trim();
+            if(!msg) return;
+            let list = JSON.parse(localStorage.getItem('ll_feedback') || '[]');
+            list.unshift({ from: currentUser.name, grade: currentUser.grade, msg, time: new Date().toLocaleString() });
+            localStorage.setItem('ll_feedback', JSON.stringify(list));
+            document.getElementById('feedback-msg').value = '';
+            alert("Feedback sent successfully.");
+        }
+
+        function submitAnswer() {
+            const ans = document.getElementById('ans-input').value.trim();
+            if(!ans) return;
+            let list = JSON.parse(localStorage.getItem('ll_answers') || '[]');
+            list.unshift({ from: currentUser.name, ans, time: new Date().toLocaleString() });
+            localStorage.setItem('ll_answers', JSON.stringify(list));
+            document.getElementById('ans-input').value = '';
+            alert("Response submitted to teacher.");
+        }
+
+        function refreshTeacherInbox() {
+            const fbContainer = document.getElementById('t-feedback-list');
+            const ansContainer = document.getElementById('t-answers-list');
+            
+            const fb = JSON.parse(localStorage.getItem('ll_feedback') || '[]');
+            const ans = JSON.parse(localStorage.getItem('ll_answers') || '[]');
+
+            fbContainer.innerHTML = fb.length ? '' : '<p style="color:#94a3b8; font-size:0.8rem;">No messages.</p>';
+            fb.forEach(f => {
+                fbContainer.innerHTML += `
+                    <div style="border-bottom: 1px solid #f1f5f9; padding: 10px 0;">
+                        <div style="font-weight:600; font-size:0.8rem;">${f.from} (G${f.grade})</div>
+                        <div style="font-size:0.85rem; color:#475569;">${f.msg}</div>
+                        <div style="font-size:0.6rem; color:#94a3b8;">${f.time}</div>
+                    </div>
+                `;
+            });
+
+            ansContainer.innerHTML = ans.length ? '' : '<p style="color:#94a3b8; font-size:0.8rem;">No answers.</p>';
+            ans.forEach(a => {
+                ansContainer.innerHTML += `
+                    <div style="border-bottom: 1px solid #f1f5f9; padding: 10px 0;">
+                        <div style="font-weight:600; font-size:0.8rem;">${a.from}</div>
+                        <div style="font-size:0.85rem; color:#475569;">${a.ans}</div>
+                        <div style="font-size:0.6rem; color:#94a3b8;">${a.time}</div>
+                    </div>
+                `;
+            });
+        }
+
+        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+    </script>
+</body>
+</html>
